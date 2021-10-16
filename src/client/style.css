@@ -85,9 +85,3 @@ body {
     font-size: 2vw;
     font-family: 'Yanone Kaffeesatz', sans-serif;
 }
-
-#testdiv {
-    position: fixed;
-    left: 5vw;
-    top: 5vh;
-}
