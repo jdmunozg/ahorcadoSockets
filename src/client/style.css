@@ -66,8 +66,12 @@ body {
 }
 
 #termino {
+    /*background-color: red;*/
+    width: 100px;
+    height: 100px;
+    border-radius: 100px;
     position: fixed;
-    top: 80vh;
+    top: 85vh;
 }
 
 #reinicio {
@@ -80,4 +84,10 @@ body {
     cursor: pointer;
     font-size: 2vw;
     font-family: 'Yanone Kaffeesatz', sans-serif;
+}
+
+#testdiv {
+    position: fixed;
+    left: 5vw;
+    top: 5vh;
 }

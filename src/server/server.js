@@ -19,13 +19,29 @@ io.on("connection", async(socket) => {
         registroDatos(data, socket.id);
     });
     var x = await resolveAfter2Seconds(1);
+    if (mesajes.length == 1) {
+        for (let i = 0; i < clientList.length; i++) {
+            console.log("var", clientList[i].turno == mesajes[mesajes.length - 1].turno);
+            if (clientList[i].turno === mesajes[mesajes.length - 1].turno) {
+                var x = await resolveAfter2Seconds(1);
+                io.to(clientList[i].id).emit('desbloquear', { msg: 'es tu turno' });
+            } else {
+                var x = await resolveAfter2Seconds(1);
+                io.to(clientList[i].id).emit('bloquearInput', { msg: 'No es tu turno' });
+            }
+        }
+    }
     socket.on('disconnect', () => {
         console.log("desconectado");
         mesajes.length = 0;
         mesajes = [{ tipo: 0, turno: 1, estado: 0, palabra: "" }];
         numero = -1;
         escogida = "";
-        var user = clientList.indexOf(socket.id);
+        for (let j = 0; j < clientList.length; j++) {
+            if (clientList[j].socketId == socket.id) {
+                user = j;
+            }
+        }
         clientList.splice(user, 1);
         for (let i = 0; i < clientList.length; i++) {
             if (clientList[i].turno != 1) {
@@ -34,6 +50,7 @@ io.on("connection", async(socket) => {
 
         }
     });
+
     if (numero === -1) {
         numero = Math.floor(Math.random() * palabras.length);
         escogida = palabras[numero];
@@ -88,6 +105,6 @@ function resolveAfter2Seconds(x) {
     return new Promise(resolve => {
         setTimeout(() => {
             resolve(x);
-        }, 500);
+        }, 100);
     });
 }

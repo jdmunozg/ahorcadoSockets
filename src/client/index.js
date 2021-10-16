@@ -5,6 +5,7 @@ var palabraServer = "";
 var palabraAux = "";
 var guiones = "";
 var datos = [];
+var t;
 
 socket.on('connect', function() {
     socket.emit('registrer', { id: socket.id, estado: 0 });
@@ -22,20 +23,24 @@ socket.on('palabra', (palabra) => {
 socket.on('bloquearInput', (data) => {
     document.getElementById("intro").disabled = true;
     document.getElementById("boton").disabled = true;
-    document.getElementById("termino").innerHTML = data.msg;
+    var color = document.getElementById("termino");
+    color.style.backgroundColor = "red";
 });
 
 socket.on('desbloquear', (data) => {
     document.getElementById("intro").disabled = false;
     document.getElementById("boton").disabled = false;
-    document.getElementById("termino").innerHTML = data.msg;
+    var color = document.getElementById("termino");
+    color.style.backgroundColor = "green";
+
 });
 
-const actualizar = (data) => {
+const actualizar = async(data) => {
     datos = [...data];
     if (data.length > 1) {
         document.getElementById("pa").innerHTML = data[data.length - 1].palabra;
         if (data[data.length - 1].palabra.indexOf("_") == -1) {
+            var x = await resolveAfter2Seconds(1);
             alert("Gano el jugador" + data[data.length - 1].turno);
             location.reload();
         }
@@ -88,6 +93,7 @@ function valida() {
     var listaguiones = palabraAux.split(' ');
     var posiciones = [];
     var nueva = "";
+    var estado = false;
     if (letraE !== "") {
         posicion = listaPalabra.indexOf(letraE)
         posiciones.push(posicion);
@@ -99,6 +105,7 @@ function valida() {
                     posiciones.push(posicion);
                 }
             }
+            estado = true;
         } else {
             alert("error");
         }
@@ -113,8 +120,22 @@ function valida() {
     letra.value = "";
 
     datos[datos.length - 1].estado = 1;
-    datos.push({ tipo: 0, turno: datos[datos.length - 1].turno + 1, estado: 0, palabra: nueva })
+    if (estado == true) {
+        datos.push({ tipo: 0, turno: datos[datos.length - 1].turno, estado: 0, palabra: nueva })
+        estado = false;
+    } else {
+        datos.push({ tipo: 0, turno: datos[datos.length - 1].turno + 1, estado: 0, palabra: nueva })
+    }
+
     console.log(datos);
     socket.emit("new_inicio", datos);
 
+}
+
+function resolveAfter2Seconds(x) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(x);
+        }, 500);
+    });
 }
